@@ -18,10 +18,10 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("books")
-public class BookControler {
+public class BookController {
     private final BookService bookService;
 
-    public BookControler(BookService bookService) {
+    public BookController(BookService bookService) {
         this.bookService = bookService;
     }
 

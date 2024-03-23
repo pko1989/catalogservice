@@ -1,6 +1,10 @@
 package com.polarbookshop.catalogservice.web;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -13,17 +17,28 @@ import com.polarbookshop.catalogservice.domain.BookNotFoundException;
 public class BookControllerAdvice {
     @ExceptionHandler(BookNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    String bookNotFoundHandler(BookNotFoundException ex) {
+    public String bookNotFoundHandler(BookNotFoundException ex) {
         return ex.getMessage();
     }
 
     @ExceptionHandler(BookAlreadyExistsException.class)
     @ResponseStatus(HttpStatus.UNPROCESSABLE_ENTITY)
-    String bookAlreadyExistsHandler(BookAlreadyExistsException ex) {
+    public String bookAlreadyExistsHandler(BookAlreadyExistsException ex) {
         return ex.getMessage();
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public Map<String, String> handleValidationExceptions(
+        MethodArgumentNotValidException ex
+    ) {
+        final var errors = new HashMap<String, String>();
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            final var fieldName = ((FieldError) error).getField();
+            final var errorMessage = error.getDefaultMessage();
+            errors.put(fieldName, errorMessage);
+        });
+        return errors;
+    }
     
 }
